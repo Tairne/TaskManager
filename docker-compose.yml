@@ -1,0 +1,36 @@
+services:
+  taskmanager:
+    image: ${DOCKER_REGISTRY-}taskmanager
+    build:
+      context: ./TaskManager
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: 8080
+      ASPNETCORE_HTTPS_PORTS: 8081
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16
+    container_name: pg_dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: re33top100ScLp
+      POSTGRES_DB: task_manager_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U postgres -d task_manager_db"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
+
+volumes:
+  pgdata:
