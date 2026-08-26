@@ -20,6 +20,8 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
             errorCodesToAdd: null);
     })
     .UseSnakeCaseNamingConvention());
+builder.Services.AddScoped<TaskRepository>();
+builder.Services.AddScoped<UserRepository>();
 
 var app = builder.Build();
 

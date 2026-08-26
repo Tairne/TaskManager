@@ -1,11 +1,9 @@
-﻿namespace TaskManager.DB.DataModels
+﻿namespace TaskManager.DB.DTO
 {
-    public class User : IEntity
+    public class CreateUserDto
     {
-        public int Id { get; set; }
         public string Login { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
-        public string UserName { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
         public string Position { get; set; } = string.Empty;
     }

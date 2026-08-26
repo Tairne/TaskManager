@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TaskManager.DB;
@@ -11,9 +12,11 @@ using TaskManager.DB;
 namespace TaskManager.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20260826114228_AddPositionToUser")]
+    partial class AddPositionToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,7 +54,9 @@ namespace TaskManager.Migrations
                         .HasColumnName("due_date");
 
                     b.Property<int>("Priority")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
+                        .HasDefaultValue(1)
                         .HasColumnName("priority");
 
                     b.Property<int>("Status")
@@ -68,9 +73,6 @@ namespace TaskManager.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_tasks");
-
-                    b.HasIndex("AssignedTo")
-                        .HasDatabaseName("ix_tasks_assigned_to");
 
                     b.ToTable("tasks", (string)null);
                 });
@@ -109,27 +111,10 @@ namespace TaskManager.Migrations
                         .HasDefaultValue("User")
                         .HasColumnName("role");
 
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("user_name");
-
                     b.HasKey("Id")
                         .HasName("pk_users");
 
                     b.ToTable("users", (string)null);
-                });
-
-            modelBuilder.Entity("TaskManager.DB.DataModels.Task", b =>
-                {
-                    b.HasOne("TaskManager.DB.DataModels.User", "AssignedUser")
-                        .WithMany()
-                        .HasForeignKey("AssignedTo")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("fk_tasks_users_assigned_to");
-
-                    b.Navigation("AssignedUser");
                 });
 #pragma warning restore 612, 618
         }

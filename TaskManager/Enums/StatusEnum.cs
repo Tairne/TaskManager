@@ -1,6 +1,6 @@
 ﻿namespace TaskManager.Enums
 {
-    public enum Status
+    public enum StatusEnum
     {
         Created,
         InProgress,

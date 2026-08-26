@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TaskManager.DB;
@@ -11,9 +12,11 @@ using TaskManager.DB;
 namespace TaskManager.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20260826132304_AddAssignedToForeignKey")]
+    partial class AddAssignedToForeignKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,7 +54,9 @@ namespace TaskManager.Migrations
                         .HasColumnName("due_date");
 
                     b.Property<int>("Priority")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
+                        .HasDefaultValue(1)
                         .HasColumnName("priority");
 
                     b.Property<int>("Status")
@@ -108,12 +113,6 @@ namespace TaskManager.Migrations
                         .HasColumnType("text")
                         .HasDefaultValue("User")
                         .HasColumnName("role");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("user_name");
 
                     b.HasKey("Id")
                         .HasName("pk_users");

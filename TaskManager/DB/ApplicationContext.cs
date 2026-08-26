@@ -21,16 +21,18 @@ namespace TaskManager.DB
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.Description).HasMaxLength(1000);
-                entity.Property(e => e.Status).HasDefaultValue(Status.Created);
-                entity.Property(e => e.Priority).HasDefaultValue("0");
+                entity.Property(e => e.Status).HasDefaultValue(StatusEnum.Created);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
+                entity.HasOne(e => e.AssignedUser).WithMany().HasForeignKey(e => e.AssignedTo).OnDelete(DeleteBehavior.SetNull);
             });
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Login).IsRequired().HasMaxLength(32);
                 entity.Property(e => e.Password).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.Role).HasDefaultValueSql("User");
+                entity.Property(e => e.UserName).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Role).HasDefaultValue("User");
+                entity.Property(e => e.Position).IsRequired().HasMaxLength(100);
             });
         }
     }
