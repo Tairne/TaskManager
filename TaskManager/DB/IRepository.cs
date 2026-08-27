@@ -8,6 +8,5 @@ namespace TaskManager.DB
         Task<T?> GetAsync(int id, CancellationToken cancellationToken);
         Task<T> AddAsync(T entity, CancellationToken cancellationToken);
         Task<T> UpdateAsync(T entity, CancellationToken cancellationToken);
-        Task<List<T>> GetAllAsync(CancellationToken cancellationToken);
     }
 }

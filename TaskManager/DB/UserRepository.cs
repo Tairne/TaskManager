@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.DB.DataModels;
+using TaskManager.DB.DTO;
 
 namespace TaskManager.DB
 {
@@ -16,6 +17,17 @@ namespace TaskManager.DB
                 .AsNoTracking()
                 .Where(x => x.Login.Equals(login) && x.Password.Equals(password))
                 .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<List<AllUsersDto>> GetAllUserListAsync (CancellationToken cancellationToken)
+        {
+            return await context.Users
+                .AsNoTracking()
+                .Select(x => new AllUsersDto
+                {
+                    Id = x.Id,
+                    UserName = x.UserName
+                }).ToListAsync(cancellationToken);
         }
     }
 }

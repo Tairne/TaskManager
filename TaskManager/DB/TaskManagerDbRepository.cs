@@ -31,10 +31,5 @@ namespace TaskManager.DB
             await context.SaveChangesAsync(cancellationToken);
             return entity;
         }
-
-        public async Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken)
-        {
-            return await context.Set<TEntity>().ToListAsync(cancellationToken);
-        }
     }
 }
