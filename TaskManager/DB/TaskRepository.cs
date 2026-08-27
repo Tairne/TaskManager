@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using System.Threading;
+using TaskManager.DB.DataModels;
 using TaskManager.DB.DTO;
 using TaskManager.Enums;
 
@@ -54,6 +56,24 @@ namespace TaskManager.DB
             await context.SaveChangesAsync(cancellationToken);
 
             return true;
+        }
+
+        public async Task<List<AllTasksDto>> GetAllTasksAsync (int page, int pageSize, CancellationToken cancellationToken)
+        {
+            var tasks = await context.Tasks
+                .Include(x => x.AssignedUser)
+                .AsNoTracking()
+                .Select(x => new AllTasksDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    Status = x.Status.ToString(),
+                    AssignedUser = x.AssignedUser != null ? x.AssignedUser.UserName : null,
+                }).Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return tasks;
         }
     }
 }

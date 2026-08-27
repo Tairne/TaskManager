@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using TaskManager.DB;
+using TaskManager.Services;
+using TaskManager.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,10 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
     .UseSnakeCaseNamingConvention());
 builder.Services.AddScoped<TaskRepository>();
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+
 
 var app = builder.Build();
 

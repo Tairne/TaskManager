@@ -1,0 +1,71 @@
+﻿using TaskManager.DB;
+using TaskManager.DB.DTO;
+using TaskManager.Enums;
+using TaskManager.Services.Interfaces;
+
+namespace TaskManager.Services
+{
+    public class TaskService : ITaskService
+    {
+        private readonly TaskRepository repository;
+
+        public TaskService(TaskRepository repository)
+        {
+            this.repository = repository;
+        }
+
+        public async Task<DB.DataModels.Task> CreateTaskAsync(CreateTaskDto taskData, CancellationToken cancellationToken)
+        {
+            var task = new DB.DataModels.Task
+            {
+                Title = taskData.Title,
+                Description = taskData.Description,
+                Priority = taskData.Priority
+            };
+
+            return await repository.AddAsync(task, cancellationToken);
+        }
+
+        public async Task<bool> DeleteTaskAsync(int id, CancellationToken cancellationToken)
+        {
+            return await repository.DeleteTaskAsync(id, cancellationToken);
+        }
+
+        public async Task<List<AllTasksDto>> GetAllTasksAsync(int page, int pageSize, CancellationToken cancellationToken)
+        {
+            return await repository.GetAllTasksAsync(page, pageSize, cancellationToken);
+        }
+
+        public async Task<List<AllTasksDto>> GetAllTasksByUserIdAsync(int userId, int page, int pageSize, CancellationToken cancellationToken)
+        {
+            return await repository.GetAllTasksByUserAsync(userId, page, pageSize, cancellationToken);
+        }
+
+        public async Task<DB.DataModels.Task?> GetTaskByIdAsync(int id, CancellationToken cancellationToken)
+        {
+            return await repository.GetAsync(id, cancellationToken);
+        }
+
+        public async Task<bool> UpdateStatusAsync(int id, StatusEnum status, CancellationToken cancellationToken)
+        {
+            return await repository.ChangeTaskStatusAsync(id, status, cancellationToken);
+        }
+
+        public async Task<bool> UpdateTaskAsync(int id, UpdateTaskDto taskData, CancellationToken cancellationToken)
+        {
+            var task = await repository.GetAsync(id, cancellationToken);
+
+            if (task == null)
+                return false;
+
+            task.Title = taskData.Title;
+            task.Description = taskData.Description;
+            task.Priority = taskData.Priority;
+            task.DueDate = taskData.DueDate;
+            task.AssignedTo = taskData.AssignedTo;
+
+            await repository.UpdateAsync(task, cancellationToken);
+            return true;
+        }
+    }
+}
