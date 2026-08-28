@@ -19,6 +19,14 @@ namespace TaskManager.DB
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
+        public async Task<User?> GetByLoginAsync (string login, CancellationToken cancellationToken)
+        {
+            return await context.Users
+                .AsNoTracking()
+                .Where(x => x.Login == login)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
         public async Task<List<AllUsersDto>> GetAllUserListAsync (CancellationToken cancellationToken)
         {
             return await context.Users

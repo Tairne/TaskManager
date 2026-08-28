@@ -18,6 +18,13 @@ namespace TaskManager.Services
 
         public async Task<User> CreateAccountAsync(CreateUserDto accountData, CancellationToken cancellationToken)
         {
+            var existingUser = await repository.GetByLoginAsync(
+                accountData.Login,
+                cancellationToken);
+
+            if (existingUser != null)
+                throw new DuplicateLoginException(accountData.Login);
+
             User user = new User
             {
                 Login = accountData.Login,
