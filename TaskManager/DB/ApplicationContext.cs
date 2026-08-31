@@ -22,7 +22,8 @@ namespace TaskManager.DB
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.Description).HasMaxLength(1000);
                 entity.Property(e => e.Status).HasDefaultValue(StatusEnum.Created);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone").HasDefaultValueSql("NOW()");
+                entity.Property(e => e.DueDate).HasColumnType("timestamp without time zone");
                 entity.HasOne(e => e.AssignedUser).WithMany().HasForeignKey(e => e.AssignedTo).OnDelete(DeleteBehavior.SetNull);
             });
             modelBuilder.Entity<User>(entity =>

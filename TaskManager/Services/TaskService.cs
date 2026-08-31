@@ -8,10 +8,12 @@ namespace TaskManager.Services
     public class TaskService : ITaskService
     {
         private readonly TaskRepository repository;
+        private readonly UserRepository userRepository;
 
-        public TaskService(TaskRepository repository)
+        public TaskService(TaskRepository repository, UserRepository userRepository)
         {
             this.repository = repository;
+            this.userRepository = userRepository;
         }
 
         public async Task<DB.DataModels.Task> CreateTaskAsync(CreateTaskDto taskData, CancellationToken cancellationToken)
@@ -43,7 +45,15 @@ namespace TaskManager.Services
 
         public async Task<DB.DataModels.Task?> GetTaskByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return await repository.GetAsync(id, cancellationToken);
+            var task = await repository.GetAsync(id, cancellationToken);
+            var user = await userRepository.GetAsync(id, cancellationToken);
+            
+            if (task != null && user != null)
+            {
+                task.AssignedUser = user;
+            }
+
+            return task;
         }
 
         public async Task<bool> UpdateStatusAsync(int id, StatusEnum status, CancellationToken cancellationToken)
