@@ -24,8 +24,11 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
 builder.Services.AddScoped<TaskRepository>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+
+builder.Services.AddTransient<IExportService, ExportService>();
+
+builder.Services.AddSingleton<IPasswordService, PasswordService>();
 
 
 var app = builder.Build();

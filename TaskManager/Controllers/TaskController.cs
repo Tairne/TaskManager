@@ -90,5 +90,13 @@ namespace TaskManager.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("csv")]
+        public async Task<FileResult> Export([FromQuery] int page, [FromQuery(Name ="size")] int pageSize, CancellationToken cancellationToken)
+        {
+            var result = await _taskService.ExportTasksAsync(page, pageSize, cancellationToken);
+
+            return File(result, "text/csv", $"Export-{DateTime.Now.ToString("s")}.csv");
+        }
     }
 }

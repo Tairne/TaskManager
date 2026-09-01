@@ -12,5 +12,6 @@ namespace TaskManager.Services.Interfaces
         Task<bool> UpdateTaskAsync(int id, UpdateTaskDto taskData, CancellationToken cancellationToken);
         Task<bool> UpdateStatusAsync(int id, StatusEnum status, CancellationToken cancellationToken);
         Task<bool> DeleteTaskAsync(int id, CancellationToken cancellationToken);
+        Task<byte[]> ExportTasksAsync(int page, int pageSize, CancellationToken cancellationToken);
     }
 }

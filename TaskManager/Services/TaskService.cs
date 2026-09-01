@@ -9,11 +9,13 @@ namespace TaskManager.Services
     {
         private readonly TaskRepository repository;
         private readonly UserRepository userRepository;
+        private readonly IExportService exportService;
 
-        public TaskService(TaskRepository repository, UserRepository userRepository)
+        public TaskService(TaskRepository repository, UserRepository userRepository, IExportService exportService)
         {
             this.repository = repository;
             this.userRepository = userRepository;
+            this.exportService = exportService;
         }
 
         public async Task<DB.DataModels.Task> CreateTaskAsync(CreateTaskDto taskData, CancellationToken cancellationToken)
@@ -35,6 +37,11 @@ namespace TaskManager.Services
 
         public async Task<List<AllTasksDto>> GetAllTasksAsync(int page, int pageSize, CancellationToken cancellationToken)
         {
+            if (pageSize >= 500)
+            {
+                throw new RequestLimitExceeded(500);
+            }
+
             return await repository.GetAllTasksAsync(page, pageSize, cancellationToken);
         }
 
@@ -76,6 +83,18 @@ namespace TaskManager.Services
 
             await repository.UpdateAsync(task, cancellationToken);
             return true;
+        }
+
+        public async Task<byte[]> ExportTasksAsync(int page, int pageSize, CancellationToken cancellationToken)
+        {
+            if (pageSize >= 500)
+            {
+                throw new RequestLimitExceeded(500);
+            }
+
+            var tasks = await repository.GetTasksForExport(page, pageSize, cancellationToken);
+
+            return await exportService.ExportToCsvAsync(tasks, cancellationToken);
         }
     }
 }

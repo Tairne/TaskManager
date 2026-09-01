@@ -75,5 +75,26 @@ namespace TaskManager.DB
 
             return tasks;
         }
+
+        public async Task<List<TaskExportDto>> GetTasksForExport(int page, int pageSize, CancellationToken cancellationToken)
+        {
+            var tasks = await context.Tasks
+                .Include(x => x.AssignedUser)
+                .AsNoTracking()
+                .Select(x => new TaskExportDto
+                {
+                    Title = x.Title,
+                    Description = x.Description,
+                    Status = x.Status.ToString(),
+                    Priority = x.Priority.ToString(),
+                    CreatedAt = x.CreatedAt.ToString("dd.MM.yyyy"),
+                    DueDate = x.DueDate.HasValue ? x.DueDate.Value.ToString("dd.MM.yyyy") : string.Empty,
+                    AssignedUser = x.AssignedUser != null ? x.AssignedUser.UserName : string.Empty,
+                }).Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return tasks;
+        }
     }
 }

@@ -7,4 +7,12 @@
         {
         }
     }
+
+    public class RequestLimitExceeded : Exception
+    {
+        public RequestLimitExceeded(int limit)
+            : base($"The page size should not exceed {limit} entries")
+        { 
+        }
+    }
 }
