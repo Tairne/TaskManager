@@ -29,6 +29,7 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddTransient<IExportService, ExportService>();
 
 builder.Services.AddSingleton<IPasswordService, PasswordService>();
+builder.Services.AddSingleton<IApplicationMetrics, ApplicationMetrics>();
 
 
 var app = builder.Build();
