@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.DB.DataModels;
 using TaskManager.DB.DTO;
+using Task = System.Threading.Tasks.Task;
 
 namespace TaskManager.DB
 {
@@ -36,6 +37,15 @@ namespace TaskManager.DB
                     Id = x.Id,
                     UserName = x.UserName
                 }).ToListAsync(cancellationToken);
+        }
+
+        public async Task SaveRefreshToken(User user, string token, CancellationToken cancellationToken)
+        {
+            user.RefreshToken = token;
+            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
+            context.Entry(user).State = EntityState.Modified;
+
+            await context.SaveChangesAsync();
         }
     }
 }

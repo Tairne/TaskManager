@@ -67,6 +67,11 @@ namespace TaskManager.Services
         {
             var user = await repository.GetAsync(id, cancellationToken);
 
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User id {id} not found");
+            }
+
             if (!passwordService.Verify(password.CurrentPassword, user.Password))
             {
                 return false;

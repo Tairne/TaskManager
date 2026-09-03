@@ -34,6 +34,7 @@ namespace TaskManager.DB
                 entity.Property(e => e.UserName).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.Role).HasDefaultValue("User");
                 entity.Property(e => e.Position).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.RefreshTokenExpiryTime).HasColumnType("timestamp without time zone");
             });
         }
     }
