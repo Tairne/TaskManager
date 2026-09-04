@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManager.DB.DTO;
 using TaskManager.Enums;
@@ -17,6 +18,7 @@ namespace TaskManager.Controllers
             this._taskService = taskService;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<List<AllTasksDto>>> GetAllTasksAsync([FromQuery] int page, [FromQuery(Name = "size")] int pageSize, CancellationToken cancellationToken)
         {
@@ -24,6 +26,7 @@ namespace TaskManager.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("user")]
         public async Task<ActionResult<List<AllTasksDto>>> GetAllTasksByUserAsync([FromQuery(Name = "user")] int userId, [FromQuery] int page, [FromQuery(Name = "size")] int pageSize, CancellationToken cancellationToken)
         {
@@ -31,6 +34,7 @@ namespace TaskManager.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<DB.DataModels.Task>> GetTask([FromRoute] int id, CancellationToken cancellationToken)
         {
@@ -44,6 +48,7 @@ namespace TaskManager.Controllers
             return Ok(result);
         }
 
+        [Authorize(Policy = "CanManageTasks")]
         [HttpPost]
         public async Task<ActionResult<DB.DataModels.Task>> CreateTask([FromBody] CreateTaskDto task, CancellationToken cancellationToken)
         {
@@ -52,6 +57,7 @@ namespace TaskManager.Controllers
             return StatusCode(StatusCodes.Status201Created, result);
         }
 
+        [Authorize(Policy = "CanManageTasks")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTask([FromRoute] int id, [FromBody] UpdateTaskDto task, CancellationToken cancellationToken)
         {
@@ -65,6 +71,7 @@ namespace TaskManager.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateStatus([FromRoute] int id, [FromQuery] StatusEnum status, CancellationToken cancellationToken)
         {
@@ -78,6 +85,7 @@ namespace TaskManager.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTask([FromRoute] int id, CancellationToken cancellationToken)
         {
@@ -91,6 +99,7 @@ namespace TaskManager.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpGet("csv")]
         public async Task<FileResult> Export([FromQuery] int page, [FromQuery(Name ="size")] int pageSize, CancellationToken cancellationToken)
         {

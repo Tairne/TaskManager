@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
+using TaskManager.Services;
+using TaskManager.Services.Interfaces;
 
 namespace TaskManager.Middleware
 {
@@ -13,15 +16,23 @@ namespace TaskManager.Middleware
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, IApplicationMetrics metrics)
         {
+            var stopwatch = Stopwatch.StartNew();
+            metrics.RequestStarted();
             try
             {
                 await _next(context);
             }
             catch (Exception ex)
             {
+                metrics.RequestFailed();
                 await HandleExceptionAsync(context, ex);
+            }
+            finally
+            {
+                stopwatch.Stop();
+                metrics.RequestCompleted(stopwatch.Elapsed);
             }
         }
 

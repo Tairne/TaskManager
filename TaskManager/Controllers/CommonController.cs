@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManager.DB.DTO;
 using TaskManager.Services.Interfaces;
@@ -16,6 +17,7 @@ namespace TaskManager.Controllers
             _metrics = metrics;
         }
 
+        [Authorize]
         [HttpGet("metrics")]
         public ActionResult<ApplicationMetricsSnapshot> GetMetrics()
         {
