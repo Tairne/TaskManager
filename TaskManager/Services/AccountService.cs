@@ -1,7 +1,9 @@
-﻿using TaskManager.DB;
+﻿using FluentValidation;
+using TaskManager.DB;
 using TaskManager.DB.DataModels;
 using TaskManager.DB.DTO;
 using TaskManager.Services.Interfaces;
+using TaskManager.Validators;
 
 namespace TaskManager.Services
 {
@@ -24,6 +26,12 @@ namespace TaskManager.Services
 
             if (existingUser != null)
                 throw new DuplicateLoginException(accountData.Login);
+
+            var validator = new CreateUserValidator();
+            var result = await validator.ValidateAsync(accountData, cancellationToken);
+
+            if (!result.IsValid)
+                throw new ValidationException(result.Errors);
 
             User user = new User
             {
@@ -55,6 +63,12 @@ namespace TaskManager.Services
                 return false;
             }
 
+            var validator = new UpdateUserValidator();
+            var result = await validator.ValidateAsync(accountData, cancellationToken);
+
+            if (!result.IsValid)
+                throw new ValidationException(result.Errors);
+
             user.Login = accountData.Login;
             user.UserName = accountData.UserName;
             user.Position = accountData.Position;
@@ -71,6 +85,12 @@ namespace TaskManager.Services
             {
                 throw new KeyNotFoundException($"User id {id} not found");
             }
+
+            var validator = new ChangePasswordValidator();
+            var result = await validator.ValidateAsync(password, cancellationToken);
+
+            if (!result.IsValid)
+                throw new ValidationException(result.Errors);
 
             if (!passwordService.Verify(password.CurrentPassword, user.Password))
             {

@@ -65,7 +65,7 @@ namespace TaskManager.Controllers
 
             if (!result)
             {
-                return NotFound($"Task id {id} not exists");
+                return NotFound($"Task id {id} or assigned user not exists");
             }
 
             return NoContent();

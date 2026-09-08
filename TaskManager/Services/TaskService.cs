@@ -1,7 +1,9 @@
-﻿using TaskManager.DB;
+﻿using FluentValidation;
+using TaskManager.DB;
 using TaskManager.DB.DTO;
 using TaskManager.Enums;
 using TaskManager.Services.Interfaces;
+using TaskManager.Validators;
 
 namespace TaskManager.Services
 {
@@ -28,6 +30,12 @@ namespace TaskManager.Services
                 Description = taskData.Description,
                 Priority = taskData.Priority
             };
+
+            var validator = new CreateTaskValidator();
+            var result = await validator.ValidateAsync(taskData, cancellationToken);
+
+            if (!result.IsValid)
+                throw new ValidationException(result.Errors);
 
             _metrics.TaskCreated();
             return await _repository.AddAsync(task, cancellationToken);
@@ -80,8 +88,22 @@ namespace TaskManager.Services
         {
             var task = await _repository.GetAsync(id, cancellationToken);
 
+            if (taskData.AssignedTo != null)
+            {
+                var user = await _userRepository.GetAsync(taskData.AssignedTo.Value, cancellationToken);
+
+                if (user == null)
+                    return false;
+            }
+
             if (task == null)
                 return false;
+
+            var validator = new UpdateTaskValidator(task.CreatedAt);
+            var result = await validator.ValidateAsync(taskData, cancellationToken);
+
+            if (!result.IsValid)
+                throw new ValidationException(result.Errors);
 
             task.Title = taskData.Title;
             task.Description = taskData.Description;
