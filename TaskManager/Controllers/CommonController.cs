@@ -17,6 +17,10 @@ namespace TaskManager.Controllers
             _metrics = metrics;
         }
 
+        /// <summary>
+        /// Get api metrics
+        /// </summary>
+        /// <returns><see cref="ApplicationMetricsSnapshot"></returns>
         [Authorize]
         [HttpGet("metrics")]
         public ActionResult<ApplicationMetricsSnapshot> GetMetrics()
