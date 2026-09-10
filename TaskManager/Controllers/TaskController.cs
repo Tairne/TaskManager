@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using TaskManager.DB.DTO;
 using TaskManager.Enums;
 using TaskManager.Services.Interfaces;
@@ -42,6 +43,7 @@ namespace TaskManager.Controllers
 
             if (result == null)
             {
+                Log.Error("Task id {id} not exists", id);
                 return NotFound($"Task id {id} not exists");
             }
 
@@ -65,6 +67,7 @@ namespace TaskManager.Controllers
 
             if (!result)
             {
+                Log.Error("Task id {id} or assigned user not exists", id);
                 return NotFound($"Task id {id} or assigned user not exists");
             }
 
@@ -79,6 +82,7 @@ namespace TaskManager.Controllers
 
             if (!result)
             {
+                Log.Error("Task id {id} not exists", id);
                 return NotFound($"Task id {id} not exists");
             }
 
@@ -93,6 +97,7 @@ namespace TaskManager.Controllers
 
             if (!result)
             {
+                Log.Error("Task id {id} not exists", id);
                 return NotFound($"Task id {id} not exists");
             }
 

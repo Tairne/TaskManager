@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
+using Serilog;
 using TaskManager.DB;
+using TaskManager.DB.DataModels;
 using TaskManager.DB.DTO;
 using TaskManager.Enums;
 using TaskManager.Services.Interfaces;
@@ -38,12 +40,22 @@ namespace TaskManager.Services
                 throw new ValidationException(result.Errors);
 
             _metrics.TaskCreated();
-            return await _repository.AddAsync(task, cancellationToken);
+
+            var create = await _repository.AddAsync(task, cancellationToken);
+
+            Log.Information("Task Id: {0}, Title: {1} was created", create.Id, create.Title);
+
+            return create;
         }
 
         public async Task<bool> DeleteTaskAsync(int id, CancellationToken cancellationToken)
         {
-            return await _repository.DeleteTaskAsync(id, cancellationToken);
+            bool result = await _repository.DeleteTaskAsync(id, cancellationToken);
+
+            if (result)
+                Log.Information("Task Id {0} was deleted", id);
+
+            return result;
         }
 
         public async Task<List<AllTasksDto>> GetAllTasksAsync(int page, int pageSize, CancellationToken cancellationToken)
@@ -76,21 +88,29 @@ namespace TaskManager.Services
 
         public async Task<bool> UpdateStatusAsync(int id, StatusEnum status, CancellationToken cancellationToken)
         {
-            if (status == StatusEnum.Complete)
+            var result = await _repository.ChangeTaskStatusAsync(id, status, cancellationToken);
+
+            if (result)
             {
-                _metrics.TaskCompleted();
+                if (status == StatusEnum.Complete)
+                {
+                    _metrics.TaskCompleted();
+                }
+
+                Log.Information("Task Id {0} change status to {1}", id, status.ToString());
             }
 
-            return await _repository.ChangeTaskStatusAsync(id, status, cancellationToken);
+            return result;
         }
 
         public async Task<bool> UpdateTaskAsync(int id, UpdateTaskDto taskData, CancellationToken cancellationToken)
         {
             var task = await _repository.GetAsync(id, cancellationToken);
+            User? user = null;
 
             if (taskData.AssignedTo != null)
             {
-                var user = await _userRepository.GetAsync(taskData.AssignedTo.Value, cancellationToken);
+                user = await _userRepository.GetAsync(taskData.AssignedTo.Value, cancellationToken);
 
                 if (user == null)
                     return false;
@@ -112,6 +132,12 @@ namespace TaskManager.Services
             task.AssignedTo = taskData.AssignedTo;
 
             await _repository.UpdateAsync(task, cancellationToken);
+
+            if (task.AssignedTo != null)
+            {
+                Log.Information("Task Id {0} assigned to user {1}", task.Id, user.Login);
+            }
+
             return true;
         }
 

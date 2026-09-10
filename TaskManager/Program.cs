@@ -4,13 +4,33 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Events;
 using System.Text;
+using TaskManager.CommonModels;
 using TaskManager.DB;
 using TaskManager.Middleware;
 using TaskManager.Services;
 using TaskManager.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override(
+        "Microsoft.EntityFrameworkCore",
+        LogEventLevel.Warning)
+    .Enrich.FromLogContext() // Required to pull properties from LogContext
+    .WriteTo.Console()
+    .WriteTo.File(
+        path: "logs/log-.txt",
+        rollingInterval: RollingInterval.Day,
+        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss}] [{Level:u3}] [TraceId: {CorrelationId}] {Message:lj}{NewLine}{Exception}"
+    )
+    .CreateLogger();
+
+builder.Services.AddOptions<JwtOptions>().BindConfiguration("Jwt");
 
 // Add services to the container.
 
@@ -112,6 +132,23 @@ if (app.Environment.IsDevelopment())
 }
 
 // Middlewares
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseSerilogRequestLogging(options =>
+{
+    // Customize the message template (Default: "HTTP {Method} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms")
+    options.MessageTemplate = "Handled {RequestMethod} {RequestPath} in {Elapsed:0.0000} ms; Status: {StatusCode}";
+
+    // Emit a debug-level log instead of information for successful requests
+    options.GetLevel = (httpContext, elapsed, ex) =>
+        ex != null ? Serilog.Events.LogEventLevel.Error : Serilog.Events.LogEventLevel.Information;
+
+    // Attach custom properties from the HttpContext to the structured log
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("Host", httpContext.Request.Host.Value);
+        diagnosticContext.Set("Protocol", httpContext.Request.Protocol);
+    };
+});
 app.UseMiddleware<ExceptionHandler>();
 
 app.UseHttpsRedirection();

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
@@ -62,6 +63,8 @@ namespace TaskManager.Middleware
                 StatusCode = context.Response.StatusCode,
                 Message = exception.Message // Return the exception message
             };
+
+            Log.Error(exception.Message);
 
             return context.Response.WriteAsync(JsonSerializer.Serialize(response));
         }

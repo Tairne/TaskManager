@@ -1,9 +1,12 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Authentication;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using TaskManager.CommonModels;
 using TaskManager.DB;
 using TaskManager.DB.DataModels;
 using TaskManager.DB.DTO;
@@ -15,13 +18,13 @@ namespace TaskManager.Services
     {
         private readonly UserRepository _repository;
         private readonly IPasswordService _passwordService;
-        private readonly IConfiguration _config;
+        private readonly JwtOptions _jwtOptions;
 
-        public LoginService(UserRepository repository, IPasswordService passwordService, IConfiguration config)
+        public LoginService(UserRepository repository, IPasswordService passwordService, IOptions<JwtOptions> jwtOptions)
         {
             this._repository = repository;
             this._passwordService = passwordService;
-            this._config = config;
+            this._jwtOptions = jwtOptions.Value;
         }
 
         public async Task<TokenResponseDto?> LoginAsync(string login, string password, CancellationToken cancellationToken)
@@ -38,6 +41,8 @@ namespace TaskManager.Services
                 AccessToken = CreateToken(user),
                 RefreshToken = await RefreshAsync(user, cancellationToken)
             };
+
+            Log.Information("User {login} sign in", login);
 
             return result;
         }
@@ -66,13 +71,13 @@ namespace TaskManager.Services
                 new Claim("Position", user.Position)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetValue<string>("Jwt:Key")));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
             var tokenDescriptor = new JwtSecurityToken(
-                issuer: _config.GetValue<string>("Jwt:Issuer"),
-                audience: _config.GetValue<string>("Jwt:Audience"),
+                issuer: _jwtOptions.Issuer,
+                audience: _jwtOptions.Audience,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(15),
+                expires: DateTime.Now.AddMinutes(_jwtOptions.ExpiryInMinutes),
                 signingCredentials: credentials
             );
 
