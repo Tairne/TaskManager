@@ -11,12 +11,12 @@ namespace TaskManager.Services
 {
     public class TaskService : ITaskService
     {
-        private readonly TaskRepository _repository;
-        private readonly UserRepository _userRepository;
+        private readonly ITaskRepository _repository;
+        private readonly IUserRepository _userRepository;
         private readonly IExportService _exportService;
         private readonly IApplicationMetrics _metrics;
 
-        public TaskService(TaskRepository repository, UserRepository userRepository, IExportService exportService, IApplicationMetrics metrics)
+        public TaskService(ITaskRepository repository, IUserRepository userRepository, IExportService exportService, IApplicationMetrics metrics)
         {
             this._repository = repository;
             this._userRepository = userRepository;
@@ -60,7 +60,7 @@ namespace TaskManager.Services
 
         public async Task<List<AllTasksDto>> GetAllTasksAsync(int page, int pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize >= 500)
+            if (pageSize > 500)
             {
                 throw new RequestLimitExceeded(500);
             }
@@ -76,9 +76,15 @@ namespace TaskManager.Services
         public async Task<DB.DataModels.Task?> GetTaskByIdAsync(int id, CancellationToken cancellationToken)
         {
             var task = await _repository.GetAsync(id, cancellationToken);
-            var user = await _userRepository.GetAsync(id, cancellationToken);
-            
-            if (task != null && user != null)
+
+            if (task == null)
+                return null;
+
+            var user = task.AssignedTo != null
+                ? await _userRepository.GetAsync(task.AssignedTo.Value, cancellationToken)
+                : null;
+
+            if (user != null)
             {
                 task.AssignedUser = user;
             }
@@ -143,7 +149,7 @@ namespace TaskManager.Services
 
         public async Task<byte[]> ExportTasksAsync(int page, int pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize >= 500)
+            if (pageSize > 500)
             {
                 throw new RequestLimitExceeded(500);
             }

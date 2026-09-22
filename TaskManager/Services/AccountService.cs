@@ -9,10 +9,10 @@ namespace TaskManager.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly UserRepository repository;
+        private readonly IUserRepository repository;
         private readonly IPasswordService passwordService;
 
-        public AccountService(UserRepository repository, IPasswordService passwordService)
+        public AccountService(IUserRepository repository, IPasswordService passwordService)
         {
             this.repository = repository;
             this.passwordService = passwordService;
@@ -51,7 +51,8 @@ namespace TaskManager.Services
 
         public async Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return await repository.GetAsync(id, cancellationToken);
+            var result = await repository.GetAsync(id, cancellationToken);
+            return result;
         }
             
         public async Task<bool> UpdateAccountAsync(int id, UpdateUserDto accountData, CancellationToken cancellationToken)

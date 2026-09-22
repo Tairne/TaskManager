@@ -16,11 +16,11 @@ namespace TaskManager.Services
 {
     public class LoginService : ILoginService
     {
-        private readonly UserRepository _repository;
+        private readonly IUserRepository _repository;
         private readonly IPasswordService _passwordService;
         private readonly JwtOptions _jwtOptions;
 
-        public LoginService(UserRepository repository, IPasswordService passwordService, IOptions<JwtOptions> jwtOptions)
+        public LoginService(IUserRepository repository, IPasswordService passwordService, IOptions<JwtOptions> jwtOptions)
         {
             this._repository = repository;
             this._passwordService = passwordService;

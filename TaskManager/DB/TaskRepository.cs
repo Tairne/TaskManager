@@ -7,7 +7,7 @@ using TaskManager.Enums;
 
 namespace TaskManager.DB
 {
-    public class TaskRepository : TaskManagerDbRepository<DataModels.Task,ApplicationContext>
+    public class TaskRepository : TaskManagerDbRepository<DataModels.Task,ApplicationContext>, ITaskRepository
     {
         public TaskRepository(ApplicationContext context) : base(context)
         {

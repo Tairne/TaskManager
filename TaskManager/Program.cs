@@ -108,8 +108,8 @@ builder.Services.AddAuthorization(opts => {
     });
 });
 
-builder.Services.AddScoped<TaskRepository>();
-builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ILoginService, LoginService>();

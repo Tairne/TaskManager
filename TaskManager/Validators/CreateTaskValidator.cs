@@ -12,6 +12,9 @@ namespace TaskManager.Validators
                 .WithMessage("Title is required")
                 .MinimumLength(4)
                 .WithMessage("The title must contain at least 4 characters.");
+            RuleFor(x => x.Priority)
+            .IsInEnum()
+            .WithMessage("Priority must by belong to PriorityEnum");
         }
     }
 }

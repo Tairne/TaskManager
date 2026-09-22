@@ -5,7 +5,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace TaskManager.DB
 {
-    public class UserRepository : TaskManagerDbRepository<User, ApplicationContext>
+    public class UserRepository : TaskManagerDbRepository<User, ApplicationContext>, IUserRepository
     {
         public UserRepository(ApplicationContext context) : base(context)
         {
