@@ -121,7 +121,7 @@ namespace TaskManager.Test
 
             _serviceMock.Setup(x => x.GetTaskByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync(task);
 
-            var result = await _sut.GetTask(id, CancellationToken.None);
+            var result = await _sut.GetTaskAsync(id, CancellationToken.None);
 
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
 
@@ -141,7 +141,7 @@ namespace TaskManager.Test
 
             _serviceMock.Setup(x => x.GetTaskByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync((DB.DataModels.Task?)null);
 
-            var result = await _sut.GetTask(id, CancellationToken.None);
+            var result = await _sut.GetTaskAsync(id, CancellationToken.None);
 
             Assert.IsType<NotFoundObjectResult>(result.Result);
 

@@ -8,12 +8,19 @@ using TaskManager.Services.Interfaces;
 
 namespace TaskManager.Controllers
 {
+    /// <summary>
+    /// Task Controller
+    /// </summary>
     [Route("api/[controller]s")]
     [ApiController]
     public class TaskController : ControllerBase
     {
         private readonly ITaskService _taskService;
 
+        /// <summary>
+        /// Methods for managing tasks
+        /// </summary>
+        /// <param name="taskService"></param>
         public TaskController(ITaskService taskService)
         {
             this._taskService = taskService;
@@ -58,7 +65,7 @@ namespace TaskManager.Controllers
         /// <response code="200">Task <a href='#model-DB.DataModels.Task'>Task</a></response>
         [Authorize]
         [HttpGet("{id}")]
-        public async Task<ActionResult<DB.DataModels.Task>> GetTask([FromRoute] int id, CancellationToken cancellationToken)
+        public async Task<ActionResult<DB.DataModels.Task>> GetTaskAsync([FromRoute] int id, CancellationToken cancellationToken)
         {
             var result = await _taskService.GetTaskByIdAsync(id, cancellationToken);
 

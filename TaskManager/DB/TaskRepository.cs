@@ -35,7 +35,7 @@ namespace TaskManager.DB
 
         public async Task<bool> ChangeTaskStatusAsync(int id, StatusEnum status, CancellationToken cancellationToken)
         {
-            var task = await context.Tasks.Where(x => x.Id == id).FirstAsync(cancellationToken);
+            var task = await context.Tasks.Where(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
 
             if (task == null)
                 return false;
