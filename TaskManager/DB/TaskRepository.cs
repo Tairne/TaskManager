@@ -47,15 +47,22 @@ namespace TaskManager.DB
 
         public async Task<bool> DeleteTaskAsync(int id, CancellationToken cancellationToken)
         {
-            var task = await context.Tasks.FindAsync(id, cancellationToken);
+            var task = await context.Tasks.FindAsync([id], cancellationToken);
 
             if (task == null)
                 return false;
 
             context.Tasks.Remove(task);
-            await context.SaveChangesAsync(cancellationToken);
 
-            return true;
+            try
+            {
+                await context.SaveChangesAsync(cancellationToken);
+                return true;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
         }
 
         public async Task<List<AllTasksDto>> GetAllTasksAsync (int page, int pageSize, CancellationToken cancellationToken)

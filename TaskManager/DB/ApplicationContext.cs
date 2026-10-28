@@ -25,6 +25,7 @@ namespace TaskManager.DB
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone").HasDefaultValueSql("NOW()");
                 entity.Property(e => e.DueDate).HasColumnType("timestamp without time zone");
                 entity.HasOne(e => e.AssignedUser).WithMany().HasForeignKey(e => e.AssignedTo).OnDelete(DeleteBehavior.SetNull);
+                entity.Property(e => e.Version).IsRowVersion();
             });
             modelBuilder.Entity<User>(entity =>
             {

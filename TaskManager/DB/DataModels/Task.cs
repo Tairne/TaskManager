@@ -13,5 +13,6 @@ namespace TaskManager.DB.DataModels
         public DateTime? DueDate { get; set; }
         public User? AssignedUser { get; set; }
         public int? AssignedTo { get; set; }
+        public uint Version { get; set; }
     }
 }
